@@ -121,3 +121,164 @@
     
         ...//其他控制器动作
     }
+    
+## 路由功能
+#### 简单路由
+    闭包路由
+    Route::get('hello', function () {
+        return 'Hello, Welcome to LaravelAcademy.org';
+    });
+控制器路由
+
+    Route::get('/user', 'UsersController@index');
+响应多种 HTTP 请求路由
+
+    Route::match(['get', 'post'], 'foo', function () {
+        return 'This is a request from get or post';
+    });
+
+    Route::any('bar', function () {
+        return 'This is a request from any HTTP verb';
+    });
+    
+路由重定项
+    
+    Route::redirect('/here', '/there');
+    Route::redirect('/here', '/there', 301);
+    Route::permanentRedirect('/here', '/there');
+    
+路由重定项
+     
+    Route::view('/welcome', 'welcome');
+    Route::view('/welcome', 'welcome', ['name' => 'title']);
+    
+路由参数
+    
+    Route::get('user/{id}', function ($id) {
+        return 'User ' . $id;
+    });
+    Route::get('posts/{post}/comments/{comment}', function ($postId, $commentId) {
+        return $postId . '-' . $commentId;
+    });
+     
+    
+#### 正则约束
+    
+    Route::get('user/{name}', function ($name) {
+        // $name 必须是字母且不能为空
+    })->where('name', '[A-Za-z]+');
+
+    Route::get('user/{id}', function ($id) {
+        // $id 必须是数字
+    })->where('id', '[0-9]+');
+
+    Route::get('user/{id}/{name}', function ($id, $name) {
+        // 同时指定 id 和 name 的数据格式
+    })->where(['id' => '[0-9]+', 'name' => '[a-z]+']);
+
+##### 命名路由
+    Route::get('user/profile', function () {
+        // 通过路由名称生成 URL
+        return 'my url: ' . route('profile');
+    })->name('profile');
+    
+    Route::get('user/profile', 'UserController@showProfile')->name('profile');
+    
+    // 生成URL
+    $url = route('profile');    
+    
+    Route::get('user/{id}/profile', function ($id) {
+        return $url;
+    })->name('profile');
+    
+    // 生成URL
+    $url = route('profile', ['id' => 1]);
+    
+###### 路由分组
+    * 中间件
+        Route::middleware(['first', 'second'])->group(function () {
+            Route::get('/', function () {
+                // Uses first & second Middleware
+            });
+        });
+    * 命名空间
+        Route::namespace('Admin')->group(function () {
+            // Controllers Within The "App\Http\Controllers\Admin" Namespace
+        });
+    * 子域名路由
+        Route::domain('{account}.blog.dev')->group(function () {
+            Route::get('user/{id}', function ($account, $id) {
+                return 'This is ' . $account . ' page of User ' . $id;
+            });
+        });
+    * 路由前缀
+        Route::prefix('admin')->group(function () {
+            Route::get('users', function () {
+                // Matches The "/admin/users" URL
+            });
+        });
+     * 路由名称前缀
+        Route::name('admin.')->group(function () {
+            Route::get('users', function () {
+                // 新的路由名称为 "admin.users"...
+            })->name('users');
+        });
+        
+#### 路由模型绑定
+    参数名（比如 {task}）来告知路由解析器需要从 Eloquent 记录中根据给定的资源 ID 去查询模型实例，并将查询结果作为参数传入
+    
+###### 隐式绑定
+    * {task} 参数值作为模型主键 ID 进行 Eloquent 查询
+  
+    Route::get('task/{task}', function (\App\Models\Task $task) {
+      dd($task); // 打印 $task 明细
+    });
+    
+    * 自定义查询字段
+    
+    <?php
+
+    namespace App\Models;
+
+    use Illuminate\Database\Eloquent\Model;
+
+    class Task extends Model
+    {
+        public function getRouteKeyName() {
+            return 'name';  // 以任务名称作为路由模型绑定查询字段
+        }
+    }
+    
+###### 显式绑定
+  在 App\Providers\RouteServiceProvider 的 boot() 方法中新增如下这段配置代码：
+  
+    public function boot()
+    {
+        // 显式路由模型绑定
+        Route::model('task_model', Task::class);
+
+        parent::boot();
+    }
+    
+  访问包含 {task_model} 参数的路由时，路由解析器都会从请求 URL 中解析出模型 ID  
+  
+        Route::get('task/model/{task_model}', function (\App\Models\Task $task) {
+            dd($task);
+        });
+        
+ 出于性能的考虑，建议在后台使用这种路由模型绑定
+ 
+###### 频率限制
+ 第一个是次数上限，第二个是指定时间段（单位：分钟）：
+ 
+    Route::middleware('throttle:60,1')->group(function () {
+        Route::get('/user', function () {
+            //
+        });
+    });
+###### 路由缓存
+    执行路由缓存命令：
+    php artisan route:cache
+    删除路由缓存
+    php artisan route:clear
+    注意：缓存只能用于控制器路由，不能用于闭包路由
