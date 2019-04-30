@@ -397,3 +397,74 @@
             //
         }
     }
+    
+## 模型
+
+    php artisan make:model Flight
+    
+    * 表名设置
+    <?php
+
+    namespace App;
+
+    use Illuminate\Database\Eloquent\Model;
+
+    class Flight extends Model
+    {
+        /**
+         * 关联到模型的数据表
+         *
+         * @var string
+         */
+        protected $table = 'my_flights';
+    }
+    
+    * 时间戳
+    <?php
+
+    namespace App;
+
+    use Illuminate\Database\Eloquent\Model;
+
+    class Flight extends Model
+    {
+        /**
+         * 表明模型是否应该被打上时间戳
+         *
+         * @var bool
+         */
+        public $timestamps = false;
+    }
+    数据库连接
+     <?php
+
+    namespace App;
+
+    use Illuminate\Database\Eloquent\Model;
+
+    class Flight extends Model
+    {
+        /**
+         * The connection name for the model.
+         *
+         * @var string
+         */
+        protected $connection = 'connection-name';
+    }
+    
+    黑名单属性-$guarded 属性包含你不想被赋值的属性数组，$fillable是白名单
+    <?php
+
+    namespace App;
+
+    use Illuminate\Database\Eloquent\Model;
+
+    class Flight extends Model
+    {
+        /**
+         * 不能被批量赋值的属性
+         *
+         * @var array
+         */
+        protected $guarded = ['price'];
+    }
