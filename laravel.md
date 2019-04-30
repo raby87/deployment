@@ -400,9 +400,10 @@
     
 ## 模型
 
-    php artisan make:model Flight
+生成模型类指令： php artisan make:model Models/Flight
     
-    * 表名设置
+ 表名设置
+ 
     <?php
 
     namespace App;
@@ -419,7 +420,8 @@
         protected $table = 'my_flights';
     }
     
-    * 时间戳
+ 时间戳
+ 
     <?php
 
     namespace App;
@@ -435,7 +437,9 @@
          */
         public $timestamps = false;
     }
-    数据库连接
+    
+数据库连接
+
      <?php
 
     namespace App;
@@ -452,7 +456,8 @@
         protected $connection = 'connection-name';
     }
     
-    黑名单属性-$guarded 属性包含你不想被赋值的属性数组，$fillable是白名单
+黑名单属性-$guarded 属性包含你不想被赋值的属性数组，$fillable是白名单
+
     <?php
 
     namespace App;
