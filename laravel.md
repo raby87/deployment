@@ -277,8 +277,123 @@
         });
     });
 ###### 路由缓存
+
     执行路由缓存命令：
     php artisan route:cache
     删除路由缓存
     php artisan route:clear
     注意：缓存只能用于控制器路由，不能用于闭包路由
+    
+### 控制器
+    Route::get('user/{id}', 'UserController@show');
+    
+    php artisan make:controller UserController 
+    
+    控制器添加一个 show 方法
+    <?php
+
+    namespace App\Http\Controllers;
+
+    use App\User;
+    use Illuminate\Http\Request;
+
+    class UserController extends Controller
+    {
+        /**
+         * 为指定用户显示详情
+         *
+         * @param int $id
+         * @return Response
+         * @author LaravelAcademy.org
+         */
+        public function show($id)
+        {
+            return view('user.profile', ['user' => User::findOrFail($id)]);
+        }
+    }
+    
+    
+ #### 控制器中间件
+ 
+        $this->middleware('auth')->only('show'); // 只对该方法生效
+        $this->middleware('auth')->except('show');  // 对该方法以外的方法生效
+    
+   
+#### 资源控制器
+
+    php artisan make:controller PostController --resource
+    
+    Route::resource('posts', 'PostController');
+    Route::resources([
+        'photos' => 'PhotoController',
+        'posts' => 'PostController'
+    ]);
+    
+#### 指定资源模型
+    php artisan make:controller PostController --resource --model=Post
+    
+    路由处理的动作子集
+    Route::resource('post', 'PostController', ['only' => 
+        ['index', 'show']
+    ]);
+
+    Route::resource('post', 'PostController', ['except' => 
+        ['create', 'store', 'update', 'destroy']
+    ]);
+    
+    API 资源路由
+    Route::apiResources([
+        'posts' => 'PostController',
+        'photos' => 'PhotoController'
+    ]);
+
+    php artisan make:controller API/PostController --api
+    
+#### 方法注入
+    * 构造函数注入
+    <?php
+
+    namespace App\Http\Controllers;
+
+    use Illuminate\Http\Request;
+
+    class UserController extends Controller
+    {
+        /**
+         * 存储新用户
+         *
+         * @param Request $request
+         * @return Response
+         */
+        public function store(Request $request)
+        {
+            $name = $request->name;
+
+            //
+        }
+    }
+    
+    * 参数注入：
+    Route::put('user/{id}', 'UserController@update');
+    
+    <?php
+
+    namespace App\Http\Controllers;
+
+    use Illuminate\Http\Request;
+
+    class UserController extends Controller
+    {
+        /**
+         * 更新指定用户
+         *
+         * @param Request $request
+         * @param int $id
+         * @return Response
+         * @translator http://laravelacademy.org
+         */
+        public function update(Request $request, $id)
+        {
+            //
+        }
+    }
