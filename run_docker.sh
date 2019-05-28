@@ -5,7 +5,7 @@ docker stop c_$product
 docker rm c_$product
 docker build -t $product .
 
-docker run --name c_$product -p 8082:81 -v /www/${product_dir}:/www  -d $product 
+docker run --name c_$product -p 8082:81 -v /www/${product_dir}:/www  -d $product  --privileged=true
 
 docker exec -it c_$product /bin/sh
 
